@@ -19,12 +19,12 @@ function toggleVideo {
     $wshell.SendKeys('%v')
 }
 
-while ($true){
-    try{
+while ($true) {
+    try {
         # Loop to read serial port
         $portName = [System.IO.Ports.SerialPort]::getportnames()
 
-        $port= new-Object System.IO.Ports.SerialPort COM6,9600,None,8,one
+        $port = new-Object System.IO.Ports.SerialPort COM4, 9600, None, 8, one
         $port.Open()
         Write-Output "Connected to port."
         while ($true) {
@@ -35,9 +35,9 @@ while ($true){
         }
     }
     catch {
-      Write-Output "Cannot connect to port. Waiting 1s then trying again."
+        Write-Output "Cannot connect to port. Waiting 1s then trying again."
     }
-    finally{
+    finally {
         $port.Close()
     }
     Sleep 1
