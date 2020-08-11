@@ -23,26 +23,41 @@ def toggle_mute():
 
 ser = serial.Serial(port='COM4')
 
+# Helper function to print from within subprocess
 def pt(status):
     print(status)
 
-def sync_status(ser):
-    import uiautomation
-    while True:
-        if(getZoomStatus.DetectZoomMeeting()):
-            pt("Meeting detected")
-            status=getZoomStatus.GetZoomStatus()
-            if("zoomMute:muted" in status):
-                pt("Muted")
-                ser.write(b'off')
-            else:
-                pt("Unmuted")
-                ser.write(b'on')
 
-thread = threading.Thread(target=sync_status, args=(ser,))
+
+# Subprocess to check for button press, then toggle mute.
+def get_button(ser):
+    while (True):
+        x = ser.readline()
+        toggle_mute()
+        print(x)        
+
+
+
+
+def light_on(light_on_var, ser):
+    if(light_on_var == True):
+        ser.write(b'off')
+    else:
+        ser.write(b'on')
+
+
+thread = threading.Thread(target=get_button, args=(ser,))
+am_muted=False
+
 thread.start()
 
-while (True):
-    ser.readline()
-    toggle_mute()
-    print("ToggleMute")
+
+while True:
+    if(getZoomStatus.DetectZoomMeeting()):
+        pt("Meeting detected")
+        am_muted_latest = "zoomMute:muted" in getZoomStatus.GetZoomStatus()
+        # pt("Latest:" +  am_muted_latest)
+        if(am_muted != am_muted_latest):
+            # pt("Changed:" + am_muted_latest)
+            light_on(not am_muted, ser)
+        am_muted = am_muted_latest
