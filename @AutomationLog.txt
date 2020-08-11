@@ -1,0 +1,9 @@
+2020-08-10 22:09:48.651 getZoomStatus.py[54] GetFirstChild -> Find Control Timeout: {ClassName: 'ZPControlPanelClass', ControlType: WindowControl}
+2020-08-10 22:15:24.901 getZoomStatus.py[54] GetFirstChild -> Find Control Timeout: {ClassName: 'ZPControlPanelClass', ControlType: WindowControl}
+2020-08-10 22:17:29.236 getZoomStatus.py[54] GetFirstChild -> Find Control Timeout: {ClassName: 'ZPControlPanelClass', ControlType: WindowControl}
+Can not load UIAutomationCore.dll.
+You may need to install Windows Update KB971513.
+https://github.com/yinkaisheng/WindowsUpdateKB971513ForIUIAutomation
+Can not load UIAutomationCore.dll.
+You may need to install Windows Update KB971513.
+https://github.com/yinkaisheng/WindowsUpdateKB971513ForIUIAutomation
