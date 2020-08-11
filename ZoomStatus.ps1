@@ -19,28 +19,41 @@ function toggleVideo {
     $wshell.SendKeys('%v')
 }
 
+
+function GetInput {
+    param ($input)
+
+}
+
 while ($true) {
     try {
-        # Loop to read serial port
-        $portName = [System.IO.Ports.SerialPort]::getportnames()
-
+        # $portName = [System.IO.Ports.SerialPort]::getportnames()
+        # Open Port Object
         $port = new-Object System.IO.Ports.SerialPort COM4, 9600, None, 8, one
         $port.Open()
         Write-Output "Connected to port."
-        while ($true) {
-            Write-Output "Waiting for input:"
-            Write-Output $port.ReadLine()
-            Write-Output "Toggling Mute."
-            toggleMute
+        # Start background job to check for button presses
+        $readJob = Start-Job -ScriptBlock {     
+            while ($true) {
+                # $input.ReadLine()
+                $wshell = New-Object -ComObject wscript.shell;
+                $wshell.SendKeys($port.ReadLine()) 
+                # Start-Sleep .3
+                # $wshell.SendKeys('%a')
+                
+        } } -ArgumentList $port
+        while($true){
+            Write-Output Get-Job $readJob
         }
     }
     catch {
         Write-Output "Cannot connect to port. Waiting 1s then trying again."
+        Start-Sleep 1
     }
     finally {
+        # Stop-Job -Id $readJob
         $port.Close()
     }
-    Sleep 1
 }
 
 # https://stackoverflow.com/questions/54826083/register-objectevent-from-runspace
