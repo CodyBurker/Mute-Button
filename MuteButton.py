@@ -21,17 +21,16 @@ def toggle_mute():
         keyboard.press("a")
         keyboard.release("a")
 
-# Helper function to print from within subprocess
-def pt(status):
-    print(status)
-
-
 # Subprocess to check for button press, then toggle mute.
 def get_button(ser):
-    while True:
-        x = ser.readline()
-        toggle_mute()
-        print(x)
+    while ser.is_open:
+        try:
+            x = ser.readline()
+            toggle_mute()
+            print("\t\t\tToggle Mute")
+        except:
+            ser.close()
+            print("Button Disconnected")  
 
 # Function to send code to toggle LED from Arduino
 def light_on(light_on_var, ser):
@@ -40,8 +39,9 @@ def light_on(light_on_var, ser):
             ser.write(b"off")
         else:
             ser.write(b"on")
-    except: 
-        pt("Error")
+    except:
+        print("\t\t\tError changing light.")
+        ser.close()
 
 # Variable for keyboard controller
 keyboard = keyboard_controller()
@@ -61,7 +61,7 @@ while True:
         # Start background thread to keep track of button presses
         thread.start()
         # Loop to sync light status
-        while True:
+        while ser.is_open:
             # Check whether a meeting is open on the computer:
             try: 
                 if getZoomStatus.DetectZoomMeeting():
@@ -73,10 +73,21 @@ while True:
                         if am_muted != am_muted_latest:
                             print("\t\tGot mute status")
                             # pt("Changed:" + am_muted_latest)
-                            light_on(not am_muted, ser)
+                            try:
+                                light_on(not am_muted, ser)
+                            except: 
+                                is_connected=False
+                                print('\t\t\tDisconnected from button!')
                         am_muted = am_muted_latest
                     except:
                         print("\t\tError getting mute stats")
+                else: 
+                    print("\tNo meeting detected. Checking again in 3s")
+                    if am_muted == False:
+                        am_muted = False
+                        light_on(not am_muted, ser)
+                    serial.tools.list_ports_windows
+                    time.sleep(3)
             except:
                 print("\tError getting Zoom meeting")
     except: 
